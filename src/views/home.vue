@@ -15,7 +15,7 @@
         <el-col :span="6">
           <div class="grid-content bg-purple header-right">
             欢迎39期星耀会员
-            <a href="#">退出</a>
+            <a href="#" @click="delClick">退出</a>
           </div>
         </el-col>
       </el-row>
@@ -24,72 +24,60 @@
     <el-container>
       <el-aside width="200px">
           <el-menu
-            default-active="1"
+            :default-active="$route.path"
             class="el-menu-vertical-demo"
             background-color="#545c64"
             text-color="#fff"
             active-text-color="#ffd04b"
             :unique-opened="true"
+            :router="true"
           >
-            <el-submenu index="1">
+            <el-submenu  v-for="item in permission" :key="item.id" :index="item.order + ''">
               <template slot="title">
                 <i class="el-icon-location"></i>
-                <span>用户管理</span>
+                <span>{{item.authName}}</span>
               </template>
-              <el-menu-item-group>
-                <el-menu-item index="1-1">用户管理</el-menu-item>
-              </el-menu-item-group>
+                <el-menu-item v-for="item2 in item.children" :key="item2.id" :index="'/'+item2.path"><i class="el-icon-menu"></i>{{item2.authName}}</el-menu-item>
             </el-submenu>
 
-            <el-submenu index="2">
-              <template slot="title">
-                <i class="el-icon-location"></i>
-                <span>权限管理</span>
-              </template>
-              <el-menu-item-group>
-                <el-menu-item index="2-1">角色列表</el-menu-item>
-                <el-menu-item index="2-2">权限列表</el-menu-item>
-              </el-menu-item-group>
-            </el-submenu>
-
-            <el-submenu index="3">
-              <template slot="title">
-                <i class="el-icon-location"></i>
-                <span>商品管理</span>
-              </template>
-              <el-menu-item-group>
-                <el-menu-item index="3-1">商品列表</el-menu-item>
-                <el-menu-item index="3-2">分类参数</el-menu-item>
-                <el-menu-item index="3-3">商品分类</el-menu-item>
-              </el-menu-item-group>
-            </el-submenu>
-
-            <el-submenu index="4">
-              <template slot="title">
-                <i class="el-icon-location"></i>
-                <span>订单管理</span>
-              </template>
-              <el-menu-item-group>
-                <el-menu-item index="4-1">订单列表</el-menu-item>
-              </el-menu-item-group>
-            </el-submenu>
-
-            <el-submenu index="5">
-              <template slot="title">
-                <i class="el-icon-location"></i>
-                <span>数据管理</span>
-              </template>
-              <el-menu-item-group>
-                <el-menu-item index="5-1">数据报表</el-menu-item>
-              </el-menu-item-group>
-            </el-submenu>
           </el-menu>
       </el-aside>
 
-      <el-main>Main</el-main>
+      <el-main>
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
 </template>
+
+<script>
+  export default {
+    data() {
+      return {
+        permission: ''
+      }
+    },
+    created() {
+      this.$http({
+        url: "menus",
+        headers: {"Authorization": localStorage.getItem("token")}
+      }).then(res => {
+        let {data :{data,meta}} =res
+        if (meta.status === 200) {
+          this.permission = data                              
+        }   
+      })
+    },
+    methods: {
+      delClick() {
+        localStorage.removeItem("token")
+        this.$router.push("/")
+      }
+    },
+  }
+  
+</script>
+
 
 <style lang="less">
 .el-container .el-header {
@@ -109,7 +97,6 @@
   background-color: #e9eef3;
   color: #333;
   text-align: center;
-  line-height: 160px;
 }
 .grid-content {
   min-height: 36px;

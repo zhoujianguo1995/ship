@@ -15,7 +15,7 @@
         <el-col :span="6">
           <div class="grid-content bg-purple header-right">
             欢迎39期星耀会员
-            <a href="#" @click="delClick">退出</a>
+            <el-button type="text" @click="delClick" style="color: orange;font-weight: 700; font-size: 16px;">退出</el-button>
           </div>
         </el-col>
       </el-row>
@@ -70,8 +70,24 @@
     },
     methods: {
       delClick() {
-        localStorage.removeItem("token")
-        this.$router.push("/")
+        this.$confirm('此操作将退出, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          localStorage.removeItem("token")
+          this.$router.push("/")
+          this.$message({
+            type: 'success',
+            message: '退出成功!'
+          });       
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消退出'
+          });          
+        });
+        
       }
     },
   }
@@ -83,6 +99,7 @@
 .el-container .el-header {
   background-color: #b3c1cd;
   padding: 0px;
+ 
 }
 
 .el-aside {
@@ -96,13 +113,11 @@
 .el-main {
   background-color: #e9eef3;
   color: #333;
-  text-align: center;
 }
 .grid-content {
   min-height: 36px;
 }
 .row-bg,
-.el-col,
 .el-container {
   height: 100%;
 }
@@ -129,11 +144,6 @@
   padding-right: 20px;
   line-height: 36px;
   margin-top: 8px;
-  a {
-    color: orange;
-    text-decoration: none;
-    margin-left: 5px;
-  }
 }
 
 .el-menu-vertical-demo.el-menu {
